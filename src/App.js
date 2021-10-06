@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import { useData } from './utilities/firebase';
 import { CourseList } from './components/CourseList';
 
 const mapValues = (fn, obj) => (
@@ -36,21 +37,11 @@ const Banner = ({ title }) => (
 );
 
 const App = () =>  {
-  const [schedule, setSchedule] = useState();
+  const [schedule, loading, error] = useData("/", addScheduleTimes);
   const url = 'https://courses.cs.northwestern.edu/394/data/cs-courses.php';
   
-  useEffect (() => {
-    const fetchScheule = async () => {
-      const response = await fetch(url);
-      if (!response.ok) throw response;
-      const json = await response.json();
-      setSchedule(addScheduleTimes(json));
-    }
-    fetchScheule();
-  }, []);
-  
-
-  if(!schedule) return <h1> Loading Schedule </h1>;
+  if (error) return <h1>{error}</h1>;
+  if (loading) return <h1>Loading the schedule...</h1>
 
   return (<div className="container">
     <Banner title = { schedule.title } />
